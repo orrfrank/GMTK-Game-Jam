@@ -10,6 +10,7 @@ public class EnemyStats : MonoBehaviour
     public LayerMask playerLayermask;
     public GameObject directionIndicator;
     public bool playerHit;
+    Vector2 targetRotation;
     public void Kill()
     {
         Destroy(gameObject);
@@ -17,7 +18,8 @@ public class EnemyStats : MonoBehaviour
     private void Update()
     {
         direction = pattern[GameManager.ticks % pattern.Length];
-        directionIndicator.transform.localEulerAngles = new Vector3(0, 0, -direction * 90);
+        targetRotation = new Vector3(0, 0, -direction * 90);
+        directionIndicator.transform.localEulerAngles = Vector3.Lerp(directionIndicator.transform.eulerAngles, targetRotation, 20*Time.deltaTime);
         CheckForPlayerHit();
     }
     void CheckForPlayerHit()

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DiceNumberManager : MonoBehaviour
 {
+
     public string startingSequence = "";
     public int bottomNum = 6;
     public int[,] dieSide = {{ 0, 5, 0 },
@@ -33,6 +34,7 @@ public class DiceNumberManager : MonoBehaviour
     }
     public void RollRight()
     {
+        
         int[] holder = { bottomNum, dieSide[1, 0], dieSide[1, 1] };
         bottomNum = dieSide[1, 2];
         dieSide[1, 0] = holder[0];

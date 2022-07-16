@@ -10,6 +10,10 @@ public class PlayerController : MonoBehaviour
     [Header("Physics Settings")]
     public LayerMask whatIsWall;
     public LayerMask enemyLayerMask;
+    [Header("Animations")]
+    public GameObject DiceModel;
+    [Header("Input Gathering")]
+    public float inputBuffer;
     //INTERNAL VARIABLES
     Rigidbody2D rb;
     int horizontalInput;
@@ -21,6 +25,7 @@ public class PlayerController : MonoBehaviour
     EnemyStats selectedEnemy;
     GameObject[] enemies;
     EnemyStats[] enemyStats;
+    float timer = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -37,44 +42,57 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        timer += Time.deltaTime;
         GetInput();
         Movement();
         UpdateDiceNumber();
         Dash();
         Attack();
+        MoveDiceToRightPosition();
         lastDir = direction;
     }
     void GetInput()
     {
+        if (timer < inputBuffer)
+        {
+            verticalInput = 0;
+            horizontalInput = 0;
+            return;
+        }
         if (Input.GetKeyDown(KeyCode.W))
         {
             verticalInput = 1;
             horizontalInput = 0;
             direction = 4;
+            timer = 0;
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
             verticalInput = -1;
             horizontalInput = 0;
             direction = 2;
+            timer = 0;
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
             horizontalInput = 1;
             verticalInput = 0;
             direction = 1;
+            timer = 0;
         }
         else if (Input.GetKeyDown(KeyCode.A))
         {
             horizontalInput = -1;
             verticalInput = 0;
             direction = 3;
+            timer = 0;
         }
         else
         {
             verticalInput = 0;
             horizontalInput= 0;
         }
+        
     }
     void UpdateDiceNumber()
     {
@@ -166,21 +184,25 @@ public class PlayerController : MonoBehaviour
             {
                 GameManager.ticks++;
                 diceNumberManager.RollRight();
+                StartCoroutine(AnimateDiceRoll(0, -90, 0, inputBuffer));
             }
             else if (horizontalInput == -1)
             {
                 GameManager.ticks++;
                 diceNumberManager.RollLeft();
+                StartCoroutine(AnimateDiceRoll(0, 90, 0, inputBuffer));
             }
             if (verticalInput == 1)
             {
                 GameManager.ticks++;
                 diceNumberManager.RollUp();
+                StartCoroutine(AnimateDiceRoll(90, 0, 0, inputBuffer));
             }
             if (verticalInput == -1)
             {
                 GameManager.ticks++;
                 diceNumberManager.RollDown();
+                StartCoroutine(AnimateDiceRoll(-90, 0, 0, inputBuffer));
             }
             currentDiceNumber = diceNumberManager.dieSide[1, 1];
             
@@ -205,6 +227,10 @@ public class PlayerController : MonoBehaviour
     void MovePlayer(int xMove, int yMove)
     {
         rb.position += new Vector2(xMove, yMove);
+    }
+    void MoveDiceToRightPosition()
+    {
+        DiceModel.transform.position = Vector3.Lerp(DiceModel.transform.position, transform.position + new Vector3(0.5f, -0.5f), 20 * Time.deltaTime);
     }
     bool GoingTowardsWall()
     {
@@ -232,6 +258,18 @@ public class PlayerController : MonoBehaviour
             MovePlayer(0, 1 * currentDiceNumber);
         }
 
+    }
+    IEnumerator AnimateDiceRoll(float xRot, float yRot, float zRot, float rotTime)
+    {
+        const float ROTATION_INTERVALS = 0.01f;
+        xRot /= 0.15f / ROTATION_INTERVALS;
+        yRot /= 0.15f / ROTATION_INTERVALS;
+        zRot /= 0.15f / ROTATION_INTERVALS;
+        for (int i = 0; i < 15; i++)
+        {
+            yield return new WaitForSeconds(0.004f);
+            DiceModel.transform.Rotate(xRot, yRot, zRot, Space.World);
+        }
     }
     private void OnTriggerEnter2D(Collider2D collision)
     {
