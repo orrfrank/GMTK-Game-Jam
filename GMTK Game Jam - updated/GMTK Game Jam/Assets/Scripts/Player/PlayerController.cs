@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    
     [Header("Dice Number Generation")]
     public DiceNumberManager diceNumberManager;
     [Header("Physics Settings")]
@@ -13,14 +14,24 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D rb;
     int horizontalInput;
     int verticalInput;
+    int lastDir;
     public int currentDiceNumber = 1;
     public int direction;
     public int dashCounter;
     EnemyStats selectedEnemy;
+    GameObject[] enemies;
+    EnemyStats[] enemyStats;
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        GameManager.ticks = 0;
+        enemies = GameObject.FindGameObjectsWithTag("enemy");
+        enemyStats = new EnemyStats[enemies.Length];
+        for (int i = 0; i < enemies.Length; i++)
+        {
+            enemyStats[i] = enemies[i].GetComponent<EnemyStats>();
+        }
     }
 
     // Update is called once per frame
@@ -31,6 +42,7 @@ public class PlayerController : MonoBehaviour
         UpdateDiceNumber();
         Dash();
         Attack();
+        lastDir = direction;
     }
     void GetInput()
     {
@@ -118,26 +130,32 @@ public class PlayerController : MonoBehaviour
             {
                 DealDamage(0, 1);
             }
-            dashCounter--;
         }
     }
     void DealDamage(int xDirection, int yDirection)
     {
         RaycastHit2D hit;
         hit = Physics2D.Raycast(transform.position + new Vector3(0.5f, -0.5f, 0), Vector2.right * xDirection + Vector2.up * yDirection, 0.6f, enemyLayerMask);
-        if (hit == null)
+        if (hit.collider == null)
             return;
-        selectedEnemy = hit.collider.gameObject.GetComponent<EnemyStats>();
-        Debug.DrawRay(transform.position, Vector2.right * xDirection + Vector2.up * yDirection);
-        if (selectedEnemy.level <= currentDiceNumber)
+        GameObject target = hit.collider.gameObject;
+        if (target.CompareTag("enemy"))
         {
-            selectedEnemy.Kill();
-            Debug.Log("Enemy Found And Killed");
+            selectedEnemy = target.GetComponent<EnemyStats>();
+            if (selectedEnemy.level <= currentDiceNumber)
+            {
+                selectedEnemy.Kill();
+            }
         }
-        else
+        else if (target.CompareTag("breakable"))
         {
-            Debug.Log("Enemy Not Found");
+            BreakableWall slectedWall = target.GetComponent<BreakableWall>();
+            if (slectedWall.level <= currentDiceNumber)
+            {
+                slectedWall.Break();
+            }
         }
+
     }
     void Movement()
     {
@@ -146,22 +164,43 @@ public class PlayerController : MonoBehaviour
             MovePlayer(horizontalInput, verticalInput);
             if (horizontalInput == 1)
             {
+                GameManager.ticks++;
                 diceNumberManager.RollRight();
             }
             else if (horizontalInput == -1)
             {
+                GameManager.ticks++;
                 diceNumberManager.RollLeft();
             }
             if (verticalInput == 1)
             {
+                GameManager.ticks++;
                 diceNumberManager.RollUp();
             }
             if (verticalInput == -1)
             {
+                GameManager.ticks++;
                 diceNumberManager.RollDown();
             }
             currentDiceNumber = diceNumberManager.dieSide[1, 1];
+            
         }
+        else
+        {
+            direction = lastDir;
+        }
+        CheckForPlayerDeath();
+    }
+    void CheckForPlayerDeath()
+    {
+        for (int i = 0; i < enemyStats.Length; i++)
+        {
+            if (enemyStats[i].playerHit)
+            {
+                GameManager.RestartLevel();
+            }
+        }
+        
     }
     void MovePlayer(int xMove, int yMove)
     {
@@ -200,6 +239,12 @@ public class PlayerController : MonoBehaviour
         {
             UseBouncePad(collision);
         }
-        
+        if (collision.tag == "button")
+        {
+            Button button = collision.GetComponent<Button>();
+            if (currentDiceNumber >= button.level)
+                button.OpenDoor();
+        }
+
     }
 }
