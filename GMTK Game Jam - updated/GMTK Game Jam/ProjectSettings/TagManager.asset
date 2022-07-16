@@ -6,6 +6,7 @@ TagManager:
   tags:
   - testing
   - jumpPad
+  - enemy
   layers:
   - Default
   - TransparentFX
@@ -15,7 +16,7 @@ TagManager:
   - UI
   - testing
   - Wall
-  - 
+  - enemy
   - 
   - 
   - 

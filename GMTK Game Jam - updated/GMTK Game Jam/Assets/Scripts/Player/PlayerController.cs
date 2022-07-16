@@ -8,12 +8,15 @@ public class PlayerController : MonoBehaviour
     public DiceNumberManager diceNumberManager;
     [Header("Physics Settings")]
     public LayerMask whatIsWall;
+    public LayerMask enemyLayerMask;
     //INTERNAL VARIABLES
     Rigidbody2D rb;
     int horizontalInput;
     int verticalInput;
     public int currentDiceNumber = 1;
     public int direction;
+    public int dashCounter;
+    EnemyStats selectedEnemy;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +30,7 @@ public class PlayerController : MonoBehaviour
         Movement();
         UpdateDiceNumber();
         Dash();
+        Attack();
     }
     void GetInput()
     {
@@ -73,7 +77,7 @@ public class PlayerController : MonoBehaviour
     }
     void Dash()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKeyDown(KeyCode.LeftShift) && dashCounter > 0)
         {
             if (direction == 1)
             {
@@ -91,6 +95,48 @@ public class PlayerController : MonoBehaviour
             {
                 MovePlayer(0, currentDiceNumber);
             }
+            dashCounter--;
+        }
+    }
+    void Attack()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (direction == 1)
+            {
+                DealDamage(1, 0);
+            }
+            else if (direction == 2)
+            {
+                DealDamage(0, -1);
+            }
+            else if (direction == 3)
+            {
+                DealDamage(-1, 0);
+            }
+            else if (direction == 4)
+            {
+                DealDamage(0, 1);
+            }
+            dashCounter--;
+        }
+    }
+    void DealDamage(int xDirection, int yDirection)
+    {
+        RaycastHit2D hit;
+        hit = Physics2D.Raycast(transform.position + new Vector3(0.5f, -0.5f, 0), Vector2.right * xDirection + Vector2.up * yDirection, 0.6f, enemyLayerMask);
+        if (hit == null)
+            return;
+        selectedEnemy = hit.collider.gameObject.GetComponent<EnemyStats>();
+        Debug.DrawRay(transform.position, Vector2.right * xDirection + Vector2.up * yDirection);
+        if (selectedEnemy.level <= currentDiceNumber)
+        {
+            selectedEnemy.Kill();
+            Debug.Log("Enemy Found And Killed");
+        }
+        else
+        {
+            Debug.Log("Enemy Not Found");
         }
     }
     void Movement()
