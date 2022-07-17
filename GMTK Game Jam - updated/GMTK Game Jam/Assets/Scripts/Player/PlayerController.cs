@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     [Header("Animations")]
     public GameObject DiceModel;
     public ParticleSystem deathParticle;
+    public GameObject rotationIcon;
     [Header("Input Gathering")]
     public float inputBuffer;
     //INTERNAL VARIABLES
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour
     float dirIndTargetRotation;
     public GameObject directionIndicator;
     public string startingSequence = "";
+    bool canRotate = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -95,6 +97,10 @@ public class PlayerController : MonoBehaviour
         {
             verticalInput = 0;
             horizontalInput= 0;
+        }
+        if (canRotate)
+        {
+            RotationAbility();
         }
         
     }
@@ -272,6 +278,19 @@ public class PlayerController : MonoBehaviour
         }
         
     }
+    void RotationAbility()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            diceNumberManager.RollRight();
+            StartCoroutine(AnimateDiceRoll(0, -90, 0, inputBuffer));
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            diceNumberManager.RollUp();
+            StartCoroutine(AnimateDiceRoll(90, 0, 0, inputBuffer));
+        }
+    }
     void MovePlayer(int xMove, int yMove)
     {
         rb.position += new Vector2(xMove, yMove);
@@ -363,6 +382,18 @@ public class PlayerController : MonoBehaviour
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
-        
+        if (collision.tag == "RotationTile")
+        {
+            canRotate = true;
+            rotationIcon.SetActive(true);
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.tag == "RotationTile")
+        {
+            canRotate = false;
+            rotationIcon.SetActive(false);
+        }
     }
 }

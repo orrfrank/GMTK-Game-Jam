@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Tutorial-3.unity
     guid: ecf8278e11a62204e854639134d985f5
   - enabled: 1
+    path: Assets/Scenes/newLevel2.unity
+    guid: 876f782e1fb88774892d220535b190b3
+  - enabled: 1
     path: Assets/Scenes/Testing Playground - noam.unity
     guid: c928baf3c926f304783c404b3e4f36bd
   - enabled: 1

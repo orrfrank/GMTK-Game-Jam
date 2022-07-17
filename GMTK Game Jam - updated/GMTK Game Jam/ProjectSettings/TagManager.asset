@@ -11,6 +11,7 @@ TagManager:
   - breakable
   - void
   - LevelEnd
+  - RotationTile
   layers:
   - Default
   - TransparentFX
