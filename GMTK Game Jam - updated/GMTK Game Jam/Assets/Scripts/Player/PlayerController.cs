@@ -102,6 +102,10 @@ public class PlayerController : MonoBehaviour
         {
             RotationAbility();
         }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Kill();
+        }
         
     }
     void RotateDirectionIndicator()
