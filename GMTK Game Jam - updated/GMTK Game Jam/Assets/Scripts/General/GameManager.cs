@@ -32,6 +32,13 @@ public class GameManager : MonoBehaviour
     }
     public static void LoadNextLevel()
     {
+        timer = 0;
+        isDead = true;
+        gameManager.StartCoroutine(LevelLoadingAnimation());
+    }
+    static IEnumerator LevelLoadingAnimation()
+    {
+        yield return new WaitForSeconds(1.5f);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
     static IEnumerator DeathAnimation()

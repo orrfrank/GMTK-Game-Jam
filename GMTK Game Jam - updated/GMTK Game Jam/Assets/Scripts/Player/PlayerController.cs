@@ -267,7 +267,7 @@ public class PlayerController : MonoBehaviour
         {
             if (enemyStats[i].playerHit)
             {
-                GameManager.RestartLevel();
+                Kill();
             }
         }
         
@@ -289,8 +289,10 @@ public class PlayerController : MonoBehaviour
         GameManager.RestartLevel();
     }
  
-    void UseBouncePad(Collider2D collision)
+    IEnumerator UseBouncePad(Collider2D collision)
     {
+        timer = 0;
+        yield return new WaitForSeconds(0.2f);
         BouncePad bouncePad = collision.GetComponent<BouncePad>();
         int jumpDirection = bouncePad.direction;
         if (jumpDirection == 1)
@@ -309,6 +311,8 @@ public class PlayerController : MonoBehaviour
         {
             MovePlayer(0, 1 * currentDiceNumber);
         }
+        timer = 0;
+        yield return new WaitForSeconds(0.2f);
 
     }
     IEnumerator AnimateDiceRoll(float xRot, float yRot, float zRot, float rotTime)
@@ -339,7 +343,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.tag == "jumpPad")
         {
-            UseBouncePad(collision);
+            StartCoroutine( UseBouncePad(collision));
         }
         if (collision.tag == "button")
         {
@@ -349,6 +353,7 @@ public class PlayerController : MonoBehaviour
         }
         if (collision.tag == "void" || collision.tag == "breakable")
         {
+            Debug.Log("WasKilled");
             Kill();
         }
         if (collision.tag == "LevelEnd")

@@ -6,6 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Tutorial-1.unity
+    guid: 84a58a54d874a0c41a3f52ffd6292b96
+  - enabled: 1
+    path: Assets/Scenes/Tutorial-2.unity
+    guid: 5ded59df26b7f3444852be6f20b1c82f
+  - enabled: 1
+    path: Assets/Scenes/Tutorial-3.unity
+    guid: ecf8278e11a62204e854639134d985f5
+  - enabled: 1
     path: Assets/Scenes/Testing Playground - noam.unity
     guid: c928baf3c926f304783c404b3e4f36bd
   - enabled: 1
