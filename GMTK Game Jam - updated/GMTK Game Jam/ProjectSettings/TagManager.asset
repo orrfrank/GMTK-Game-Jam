@@ -10,6 +10,7 @@ TagManager:
   - button
   - breakable
   - void
+  - LevelEnd
   layers:
   - Default
   - TransparentFX

@@ -30,6 +30,10 @@ public class GameManager : MonoBehaviour
         gameManager.StartCoroutine(DeathAnimation());
         
     }
+    public static void LoadNextLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+    }
     static IEnumerator DeathAnimation()
     {
         yield return new WaitForSeconds(1.5f);

@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask enemyLayerMask;
     [Header("Animations")]
     public GameObject DiceModel;
+    public ParticleSystem deathParticle;
     [Header("Input Gathering")]
     public float inputBuffer;
     //INTERNAL VARIABLES
@@ -281,6 +282,13 @@ public class PlayerController : MonoBehaviour
         bool isBonking = Physics2D.Raycast(transform.position + new Vector3(0.5f, -0.5f, 0), Vector2.right * horizontalInput + Vector2.up * verticalInput, 0.51f, whatIsWall);
         return isBonking;
     }
+    void Kill()
+    {
+        deathParticle.Play();
+        DiceModel.SetActive(false);
+        GameManager.RestartLevel();
+    }
+ 
     void UseBouncePad(Collider2D collision)
     {
         BouncePad bouncePad = collision.GetComponent<BouncePad>();
@@ -341,7 +349,11 @@ public class PlayerController : MonoBehaviour
         }
         if (collision.tag == "void" || collision.tag == "breakable")
         {
-            GameManager.RestartLevel();
+            Kill();
+        }
+        if (collision.tag == "LevelEnd")
+        {
+            GameManager.LoadNextLevel();
         }
     }
     private void OnTriggerStay2D(Collider2D collision)
