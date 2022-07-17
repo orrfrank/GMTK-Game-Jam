@@ -9,6 +9,7 @@ TagManager:
   - enemy
   - button
   - breakable
+  - void
   layers:
   - Default
   - TransparentFX
@@ -21,7 +22,7 @@ TagManager:
   - enemy
   - button
   - Player
-  - 
+  - Obstacle
   - 
   - 
   - 

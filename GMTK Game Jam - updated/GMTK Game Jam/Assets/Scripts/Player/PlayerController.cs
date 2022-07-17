@@ -48,7 +48,7 @@ public class PlayerController : MonoBehaviour
         UpdateDiceNumber();
         Dash();
         Attack();
-        MoveDiceToRightPosition();
+        //MoveDiceToRightPosition();
         lastDir = direction;
     }
     void GetInput()
@@ -228,10 +228,7 @@ public class PlayerController : MonoBehaviour
     {
         rb.position += new Vector2(xMove, yMove);
     }
-    void MoveDiceToRightPosition()
-    {
-        DiceModel.transform.position = Vector3.Lerp(DiceModel.transform.position, transform.position + new Vector3(0.5f, -0.5f), 20 * Time.deltaTime);
-    }
+    
     bool GoingTowardsWall()
     {
         bool isBonking = Physics2D.Raycast(transform.position + new Vector3(0.5f, -0.5f, 0), Vector2.right * horizontalInput + Vector2.up * verticalInput, 0.51f, whatIsWall);
@@ -283,6 +280,13 @@ public class PlayerController : MonoBehaviour
             if (currentDiceNumber >= button.level)
                 button.OpenDoor();
         }
-
+        if (collision.tag == "void" || collision.tag == "breakable")
+        {
+            GameManager.RestartLevel();
+        }
+    }
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        
     }
 }
