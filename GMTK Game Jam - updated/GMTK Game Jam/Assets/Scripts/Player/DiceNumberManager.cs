@@ -5,32 +5,13 @@ using UnityEngine;
 public class DiceNumberManager : MonoBehaviour
 {
 
-    public string startingSequence = "";
+
     public int bottomNum = 6;
     public int[,] dieSide = {{ 0, 5, 0 },
                              { 4, 1, 3 },
                              { 0, 2, 0 }};
     private void Start()
-    {
-        for (int i = 0; i < startingSequence.Length; i++)
-        {
-            if (startingSequence[i] == 'd')
-            {
-                RollDown();
-            }
-            else if (startingSequence[i] == 'r')
-            {
-                RollRight();
-            }
-            else if (startingSequence[i] == 'l')
-            {
-                RollLeft();
-            }
-            else if (startingSequence[i] == 'u')
-            {
-                RollUp();
-            }
-        }
+    { 
     }
     public void RollRight()
     {

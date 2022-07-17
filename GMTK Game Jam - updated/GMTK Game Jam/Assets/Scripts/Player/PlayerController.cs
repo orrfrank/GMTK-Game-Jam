@@ -26,6 +26,9 @@ public class PlayerController : MonoBehaviour
     GameObject[] enemies;
     EnemyStats[] enemyStats;
     float timer = 0;
+    float dirIndTargetRotation;
+    public GameObject directionIndicator;
+    public string startingSequence = "";
     // Start is called before the first frame update
     void Start()
     {
@@ -37,6 +40,7 @@ public class PlayerController : MonoBehaviour
         {
             enemyStats[i] = enemies[i].GetComponent<EnemyStats>();
         }
+        StartingSequence();
     }
 
     // Update is called once per frame
@@ -45,7 +49,6 @@ public class PlayerController : MonoBehaviour
         timer += Time.deltaTime;
         GetInput();
         Movement();
-        UpdateDiceNumber();
         Dash();
         Attack();
         //MoveDiceToRightPosition();
@@ -93,6 +96,10 @@ public class PlayerController : MonoBehaviour
             horizontalInput= 0;
         }
         
+    }
+    void RotateDirectionIndicator()
+    {
+        directionIndicator.transform.eulerAngles = new Vector3(0, 0, -Mathf.Lerp(direction * 90, -directionIndicator.transform.eulerAngles.z, 0.5f * Time.deltaTime));
     }
     void UpdateDiceNumber()
     {
@@ -175,6 +182,37 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+    void StartingSequence()
+    {
+        for (int i = 0; i < startingSequence.Length; i++)
+        {
+            if (startingSequence[i] == 'd')
+            {
+                diceNumberManager.RollDown();
+                DiceModel.transform.Rotate(-90, 0, 0, Space.World);
+            }
+            else if (startingSequence[i] == 'r')
+            {
+                diceNumberManager.RollRight();
+                DiceModel.transform.Rotate(0, -90, 0, Space.World);
+
+            }
+            else if (startingSequence[i] == 'l')
+            {
+                diceNumberManager.RollLeft();
+                DiceModel.transform.Rotate(0, 90, 0, Space.World);
+            }
+            else if (startingSequence[i] == 'u')
+            {
+                diceNumberManager.RollUp();
+                DiceModel.transform.Rotate(90, 0, 0, Space.World);
+            }
+        }
+    }
+    void RotateDiceModel(float xRot, float yRot, float zRot)
+    {
+        DiceModel.transform.Rotate(xRot, yRot, zRot, Space.World);
+    }
     void Movement()
     {
         if (!GoingTowardsWall())
@@ -182,28 +220,37 @@ public class PlayerController : MonoBehaviour
             MovePlayer(horizontalInput, verticalInput);
             if (horizontalInput == 1)
             {
+                dirIndTargetRotation = 0;
                 GameManager.ticks++;
+                StartCoroutine(AnimateDirectionIndicator(0, 0, (dirIndTargetRotation - directionIndicator.transform.eulerAngles.z), 0));
                 diceNumberManager.RollRight();
                 StartCoroutine(AnimateDiceRoll(0, -90, 0, inputBuffer));
             }
             else if (horizontalInput == -1)
             {
+                dirIndTargetRotation = 180;
                 GameManager.ticks++;
+                StartCoroutine(AnimateDirectionIndicator(0, 0, (dirIndTargetRotation - directionIndicator.transform.eulerAngles.z), 0));
                 diceNumberManager.RollLeft();
                 StartCoroutine(AnimateDiceRoll(0, 90, 0, inputBuffer));
             }
-            if (verticalInput == 1)
+            else if (verticalInput == 1)
             {
+                dirIndTargetRotation = 90;
                 GameManager.ticks++;
+                StartCoroutine(AnimateDirectionIndicator(0, 0, (dirIndTargetRotation - directionIndicator.transform.eulerAngles.z), 0));
                 diceNumberManager.RollUp();
                 StartCoroutine(AnimateDiceRoll(90, 0, 0, inputBuffer));
             }
-            if (verticalInput == -1)
+            else if (verticalInput == -1)
             {
+                dirIndTargetRotation = 270;
                 GameManager.ticks++;
+                StartCoroutine(AnimateDirectionIndicator(0, 0, (dirIndTargetRotation - directionIndicator.transform.eulerAngles.z), 0));
                 diceNumberManager.RollDown();
                 StartCoroutine(AnimateDiceRoll(-90, 0, 0, inputBuffer));
             }
+            
             currentDiceNumber = diceNumberManager.dieSide[1, 1];
             
         }
@@ -266,6 +313,18 @@ public class PlayerController : MonoBehaviour
         {
             yield return new WaitForSeconds(0.004f);
             DiceModel.transform.Rotate(xRot, yRot, zRot, Space.World);
+        }
+    }
+    IEnumerator AnimateDirectionIndicator(float xRot, float yRot, float zRot, float rotTime)
+    {
+        const float ROTATION_INTERVALS = 0.01f;
+        xRot /= 0.15f / ROTATION_INTERVALS;
+        yRot /= 0.15f / ROTATION_INTERVALS;
+        zRot /= 0.15f / ROTATION_INTERVALS;
+        for (int i = 0; i < 15; i++)
+        {
+            yield return new WaitForSeconds(0.004f);
+            directionIndicator.transform.Rotate(xRot, yRot, zRot, Space.World);
         }
     }
     private void OnTriggerEnter2D(Collider2D collision)
